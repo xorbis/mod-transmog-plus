@@ -52,6 +52,10 @@ public:
         if (!item)
             return;
 
+        // XorWoW: playerbots never visit the transmogrifier; keep their ~200 accounts out of the collection table.
+        if (player->GetSession()->IsBot())
+            return;
+
         ItemTemplate const* itemTemplate = item->GetTemplate();
         if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
             return;
