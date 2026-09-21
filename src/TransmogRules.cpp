@@ -197,8 +197,11 @@ bool TransmogRules_SuitableForTransmogrification(Player const* player, ItemTempl
     if (!TransmogRules_IsItemTransmogrifiable(player, proto))
         return false;
 
+    // A look needs the proficiency of its item type (cloth/leather/mail/plate, shield, each weapon
+    // skill). Subclasses without a skill (misc armor, relics, misc weapons) return 0 from GetSkill.
+    // XorWoW: no "SubClass > 0" guard - one-handed axes are weapon subclass 0 and were skipped.
     uint32 subclassSkill = proto->GetSkill();
-    if (proto->SubClass > 0 && subclassSkill && player->GetSkillValue(subclassSkill) == 0)
+    if (subclassSkill && player->GetSkillValue(subclassSkill) == 0)
     {
         if (proto->Class == ITEM_CLASS_ARMOR && !sTransmog->AllowMixedArmorTypes)
             return false;
