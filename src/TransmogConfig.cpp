@@ -18,6 +18,7 @@ void Transmog::LoadConfig()
 {
     Enable = sConfigMgr->GetOption<bool>("Transmog.Enable", true);
     PriceCopper = sConfigMgr->GetOption<uint32>("Transmog.PriceCopper", 1000);
+    UnlockOnObtain = sConfigMgr->GetOption<bool>("Transmog.UnlockOnObtain", false);
 
     Allowed = ParseEntryList(sConfigMgr->GetOption<std::string>("Transmog.Allowed", ""));
     NotAllowed = ParseEntryList(sConfigMgr->GetOption<std::string>("Transmog.NotAllowed", ""));

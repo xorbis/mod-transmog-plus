@@ -11,6 +11,7 @@ public:
         PLAYERHOOK_ON_LOGOUT,
         PLAYERHOOK_ON_DELETE,
         PLAYERHOOK_ON_EQUIP,
+        PLAYERHOOK_ON_STORE_NEW_ITEM,
         PLAYERHOOK_ON_UNEQUIP_ITEM,
         PLAYERHOOK_ON_LEARN_SPELL,
         PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT
@@ -46,8 +47,8 @@ public:
         CharacterDatabase.Execute("DELETE FROM mod_transmog_plus WHERE Owner = {}", guid.GetCounter());
     }
 
-// Re-evaluate the stored appearance against the newly equipped item.
-    void OnPlayerEquip(Player* player, Item* item, uint8, uint8, bool) override
+// Add the item's look to the account collection; the hooks below decide when that happens.
+    static void CollectAppearance(Player* player, Item* item)
     {
         if (!item)
             return;
@@ -74,6 +75,23 @@ public:
             TransmogAddon::SendCollectionUpdated(player, itemId);
             ChatHandler(player->GetSession()).PSendSysMessage("{} {}", Transmog::GetItemLink(itemId, player->GetSession()), Tstr(player->GetSession(), LANG_TRANSMOG_APPEARANCE_ADDED));
         }
+    }
+
+// Wearing an item always collects its look (this also covers the gear worn at login).
+    void OnPlayerEquip(Player* player, Item* item, uint8, uint8, bool) override
+    {
+        CollectAppearance(player, item);
+    }
+
+// XorWoW: with Transmog.UnlockOnObtain the look is collected as soon as the item enters the bags
+// (loot, group roll, quest reward, crafting, vendor). Mail, trade and the guild bank hand items
+// over through MoveItemToInventory, which has no hook, so those still unlock when worn.
+    void OnPlayerStoreNewItem(Player* player, Item* item, uint32 /*count*/) override
+    {
+        if (!sTransmog->Enable || !sTransmog->UnlockOnObtain)
+            return;
+
+        CollectAppearance(player, item);
     }
 
 // Clear the visible override while the equipment slot is empty.

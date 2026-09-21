@@ -15,6 +15,13 @@
 #        Description: Flat copper cost per transmogrified slot.
 #        Default:     1000 (10 Silver)
 #
+#    Transmog.UnlockOnObtain
+#        Description: Also add an appearance to the account collection when the item is obtained
+#                     (looted, won on a roll, quest reward, crafted, bought from a vendor), not only
+#                     when it is equipped. Items received by mail, trade or from the guild bank still
+#                     unlock when equipped.
+#        Default:     0
+#
 #    Transmog.Allowed
 #        Description: A list of item entries that are allowed for transmogrification (skips quality and CanUseItem check)
 #                     Example: "25 35674 5623"
@@ -28,6 +35,7 @@
 
 Transmog.Enable = 1
 Transmog.PriceCopper = 1000
+Transmog.UnlockOnObtain = 0
 Transmog.Allowed = ""
 Transmog.NotAllowed = ""
 

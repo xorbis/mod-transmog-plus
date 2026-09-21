@@ -83,6 +83,8 @@ public:
 
     bool Enable;
     uint32 PriceCopper;
+    // XorWoW: collect a look when the item is obtained (loot, quest, craft, vendor), not only when worn.
+    bool UnlockOnObtain;
     std::set<uint32> Allowed;
     std::set<uint32> NotAllowed;
 
