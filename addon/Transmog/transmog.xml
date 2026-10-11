@@ -1030,8 +1030,14 @@
                 this:RegisterForDrag("LeftButton");
                 this:SetMovable(1);
                 this:SetUserPlaced(true);
+                this:EnableMouseWheel(true);
                 Transmog_OnLoad();
             </OnLoad>
+            <OnMouseWheel>
+                if Transmog.tab == 'items' then
+                    Transmog_ChangePage(arg1 > 0 and -1 or 1);
+                end
+            </OnMouseWheel>
             <OnShow>
                 PlaySound("igCharacterInfoOpen");
                 TransmogFrame_OnShow();
