@@ -14,7 +14,8 @@ public:
         PLAYERHOOK_ON_STORE_NEW_ITEM,
         PLAYERHOOK_ON_UNEQUIP_ITEM,
         PLAYERHOOK_ON_LEARN_SPELL,
-        PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT
+        PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
+        PLAYERHOOK_ON_BEFORE_DURABILITY_REPAIR
     }) { }
 
 // Load shared account data before applying stored visible appearances.
@@ -38,6 +39,10 @@ public:
     {
         sTransmog->UnloadPlayerSlots(player->GetGUID());
         sTransmog->ClearSelection(player->GetGUID());
+        {
+            std::unique_lock<std::shared_mutex> lock(sTransmog->slotMapMutex);
+            sTransmog->rawVisiblePlayers.erase(player->GetGUID());
+        }
         sTransmog->UnrefCollectionForAccount(player->GetSession()->GetAccountId());
     }
 
@@ -125,6 +130,15 @@ public:
             return;
 
         sTransmog->ApplySlot(player, slot, item);
+    }
+
+// XorWoW: the client drops the transmog of repaired items; send it again once the repair went out.
+    void OnPlayerBeforeDurabilityRepair(Player* player, ObjectGuid, ObjectGuid, float&, uint8) override
+    {
+        if (!sTransmog->Enable)
+            return;
+
+        sTransmog->ResendVisibleItems(player);
     }
 };
 

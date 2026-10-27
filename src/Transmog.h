@@ -118,6 +118,8 @@ public:
     // Slot state is protected separately because it changes during equipment hooks.
     std::unordered_map<ObjectGuid, std::array<uint32, EQUIPMENT_SLOT_END>> slotMap;
     std::unordered_map<ObjectGuid, uint8> selectionCache;
+    // XorWoW: players whose own client is briefly sent the real item entries (see ResendVisibleItems).
+    std::unordered_set<ObjectGuid> rawVisiblePlayers;
     mutable std::shared_mutex slotMapMutex;
     mutable std::shared_mutex collectionMutex;
 
@@ -139,6 +141,9 @@ public:
     void RefreshAllSlots(Player* player);
     void ClearAllSlots(Player* player);
     uint32 GetVisibleEntryForSlot(Player const* player, uint8 slot, Item const* item) const;
+    // XorWoW: a repair makes the client redraw the real look; flip the visible fields to make it redraw the transmog.
+    void ResendVisibleItems(Player* player);
+    bool IsSendingRawVisible(ObjectGuid guid) const;
 
     uint8 GetSelectedSlot(ObjectGuid guid) const;
     void SetSelectedSlot(ObjectGuid guid, uint8 slot);

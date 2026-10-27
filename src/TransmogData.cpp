@@ -148,3 +148,46 @@ void Transmog::ClearSelection(ObjectGuid guid)
     std::unique_lock<std::shared_mutex> lock(slotMapMutex);
     selectionCache.erase(guid);
 }
+
+// XorWoW: after a repair the client redraws the repaired items with their own look although the
+// visible-item fields still hold the transmog. Send this player's own client the real entries for
+// a moment, then the transmog again, so the fields change and the client redraws them.
+void Transmog::ResendVisibleItems(Player* player)
+{
+    ObjectGuid guid = player->GetGUID();
+
+    auto forceTransmogSlots = [this, player]()
+    {
+        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+        {
+            Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (item && GetVisibleEntryForSlot(player, slot, item) != item->GetEntry())
+                player->ForceValuesUpdateAtIndex(GetVisibleItemIndex(slot));
+        }
+    };
+
+    // The repair's own item updates go out this tick; flip the fields on the following ones.
+    player->m_Events.AddEventAtOffset([this, player, guid, forceTransmogSlots]()
+    {
+        {
+            std::unique_lock<std::shared_mutex> lock(slotMapMutex);
+            rawVisiblePlayers.insert(guid);
+        }
+        forceTransmogSlots();
+
+        player->m_Events.AddEventAtOffset([this, player, guid, forceTransmogSlots]()
+        {
+            {
+                std::unique_lock<std::shared_mutex> lock(slotMapMutex);
+                rawVisiblePlayers.erase(guid);
+            }
+            forceTransmogSlots();
+        }, 250ms);
+    }, 250ms);
+}
+
+bool Transmog::IsSendingRawVisible(ObjectGuid guid) const
+{
+    std::shared_lock<std::shared_mutex> lock(slotMapMutex);
+    return rawVisiblePlayers.contains(guid);
+}

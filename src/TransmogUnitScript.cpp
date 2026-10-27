@@ -17,7 +17,7 @@ public:
     }
 
 // Replace visible-item data in the outgoing update while preserving the packet shape.
-    void OnPatchValuesUpdate(Unit const* unit, ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player*) override
+    void OnPatchValuesUpdate(Unit const* unit, ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player* target) override
     {
         if (!unit->IsPlayer())
             return;
@@ -25,6 +25,9 @@ public:
         Player const* player = unit->ToPlayer();
         if (!player)
             return;
+
+        // XorWoW: only the player's own client takes part in the post-repair flip.
+        bool raw = target == player && sTransmog->IsSendingRawVisible(player->GetGUID());
 
         for (auto const& pair : posPointers.other)
         {
@@ -43,7 +46,7 @@ public:
             Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
             uint32 entry;
 
-            if (sTransmog->Enable)
+            if (sTransmog->Enable && !raw)
                 entry = sTransmog->GetVisibleEntryForSlot(player, slot, item);
             else
                 entry = item ? item->GetEntry() : 0;

@@ -12,6 +12,7 @@ features\collection_tooltips.lua
 features\addon_protocol.lua
 features\apply_transmog.lua
 features\outfits.lua
+features\paperdoll.lua
 features\slash_commands.lua
 ui\lifecycle.lua
 ui\appearance_list.lua
