@@ -327,7 +327,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 if self.race == 'dwarf' then
                     Y = Y - 1
                 end
-                model:SetPosition(Z + 2.0, X, Y + 0.4)
+                model:SetPosition(Z + 3.8, X + 0.5, Y + 0.4)
             end
 
             if self.currentTransmogSlot == self.inventorySlots['SecondaryHandSlot'] then
@@ -338,7 +338,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 if self.race == 'dwarf' then
                     Y = Y - 1
                 end
-                model:SetPosition(Z + 2.0, X, Y)
+                model:SetPosition(Z + 3.8, X + 0.5, Y)
             end
 
             if self.currentTransmogSlot == self.inventorySlots['RangedSlot'] then
@@ -355,7 +355,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 if self.race == 'gnome' then
                     Y = Y - 1.5
                 end
-                model:SetPosition(Z + 2.0, X, Y)
+                model:SetPosition(Z + 3.8, X + 0.5, Y)
             end
 
             model:Undress()
