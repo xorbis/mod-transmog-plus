@@ -327,18 +327,18 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 if self.race == 'dwarf' then
                     Y = Y - 1
                 end
-                model:SetPosition(Z + 3.8, X, Y + 0.4)
+                model:SetPosition(Z + 2.0, X, Y + 0.4)
             end
 
             if self.currentTransmogSlot == self.inventorySlots['SecondaryHandSlot'] then
                 model:SetRotation(-0.61);
-                model:SetPosition(Z + 3.8, X, Y)
                 if self.race == 'gnome' then
                     Y = Y - 1.5
                 end
                 if self.race == 'dwarf' then
                     Y = Y - 1
                 end
+                model:SetPosition(Z + 2.0, X, Y)
             end
 
             if self.currentTransmogSlot == self.inventorySlots['RangedSlot'] then
@@ -355,13 +355,17 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
                 if self.race == 'gnome' then
                     Y = Y - 1.5
                 end
-                model:SetPosition(Z + 3.8, X, Y)
+                model:SetPosition(Z + 2.0, X, Y)
             end
 
             model:Undress()
 
+            -- Fill the main hand first so the candidate lands in the off hand.
             if self.currentTransmogSlot == self.inventorySlots['SecondaryHandSlot'] then
-                TransmogFramePlayerModel:TryOn(self.equippedItems[self.inventorySlots['MainHandSlot']])
+                local mainHand = self:EffectiveAppearance(self.inventorySlots['MainHandSlot'])
+                if mainHand then
+                    model:TryOn(mainHand)
+                end
             end
 
             if item.id ~= Transmog.HIDDEN_ITEM_ID then

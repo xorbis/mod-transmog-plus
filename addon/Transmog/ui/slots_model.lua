@@ -59,17 +59,34 @@ end
 
 -- Rebuilds the character preview model from scratch, skipping the Hidden
 -- sentinel. DressUpModel has no per-slot TryOff, so we must Undress/re-TryOn.
+-- The order matters: a one-hand weapon goes into the first free hand, so the
+-- main hand must be tried before the off hand, and a ranged weapon replaces
+-- the melee ones on the model unless it is the slot being edited.
 function Transmog:RefreshPreviewModel()
     TransmogFramePlayerModel:Undress()
-    for _, InventorySlotId in pairs(self.inventorySlots) do
-        local effective = self.transmogStatusToServer[InventorySlotId]
-        if not effective or effective == 0 then
-            effective = self.equippedItems[InventorySlotId]
-        end
-        if effective and effective ~= 0 and effective ~= Transmog.HIDDEN_ITEM_ID then
+    local order = { 1, 3, 5, 6, 7, 8, 9, 10, 15, 18, 16, 17 }
+    if self.currentTransmogSlot == 18 then
+        order = { 1, 3, 5, 6, 7, 8, 9, 10, 15, 16, 17, 18 }
+    end
+    for _, InventorySlotId in ipairs(order) do
+        local effective = self:EffectiveAppearance(InventorySlotId)
+        if effective then
             TransmogFramePlayerModel:TryOn(effective)
         end
     end
+end
+
+-- Item id the slot currently shows (pending transmog, else the equipped item),
+-- or nil when the slot is empty or hidden.
+function Transmog:EffectiveAppearance(InventorySlotId)
+    local effective = self.transmogStatusToServer[InventorySlotId]
+    if not effective or effective == 0 then
+        effective = self.equippedItems[InventorySlotId]
+    end
+    if effective and effective ~= 0 and effective ~= Transmog.HIDDEN_ITEM_ID then
+        return effective
+    end
+    return nil
 end
 
 -- Previews a transmog appearance on the selected equipment slot.
