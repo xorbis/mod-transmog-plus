@@ -331,7 +331,7 @@ function Transmog:renderAvailableTransmogs(slot, itemClass)
             end
 
             if self.currentTransmogSlot == self.inventorySlots['SecondaryHandSlot'] then
-                model:SetRotation(-0.61);
+                model:SetRotation(0.61);
                 if self.race == 'gnome' then
                     Y = Y - 1.5
                 end
